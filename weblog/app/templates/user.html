@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import "wtf.html" as wtf %}
+{% block title %}{{user.name}} -- Profile{% endblock %}
+{% block content %}
+    {{super()}}
+        <style type="text/css">
+            div.body {color:grey;position:center} {background-image:url(/static/user.jpg)}
+            span.name {background-color:black}
+        </style>
+        <div class="body" style="padding-left:10px">
+            <h2 class="sayhi">你好,<span class="name">{{user.name}}</span></h2>
+         </div>
+        <div class="draft" style="background-color:#FFF;box-shadow:5px 5px 20px #CCC;width:260px;float:right">
+            <a href="index" class="" style="padding-left:2px" >空</a><br>
+            <a href="{{ url_for('.article',username=current_user.name) }}" class="article" style="padding-top:0px;padding-left:2px">我发表过的文章</a><br>
+            <a href="{{url_for('.pwdmodi',username=current_user.name)}}" class="" style="padding-top:0px;padding-left:2px">修改密码</a><br>
+            <a href="index" class="" style="padding-top:0px;padding-left:2px">空</a><br>
+         </div>
+        <div class="post" style="width:1000px">
+                {% if current_user.is_authenticated %}
+        <div class="col" style="width:900px;padding:5px;margin:10px">
+                {{ wtf.quick_form(form) }}
+        </div>
+                {% endif %}
+        </div>
+{% endblock %}
+

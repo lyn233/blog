@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% import "wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+{% block title %}Recycle{% endblock %}
+
+
+{% block content %}
+        {{super()}}
+        <style>
+            ul.posts {background-color:#EEE;width:700px}
+            div.col {float:center,bottom}
+            div.post-body {color:#7fffb9;background-color:rgb(51,51,51);text-indent:2em}
+        </style>
+
+<ul class="posts">
+{% for post in posts %}
+<li class="post" style="margin:3px">
+<div class="post-body" style="padding:2px">{{ post.body }}</div>
+<div class="post-author" style="margin:2px;padding:2px">作者：{{post.author.name}}</div>
+
+{% if current_user == post.author %}
+<a href="{{ url_for('.edit', id=post.id) }}">
+<span class="label label-primary">Edit</span>
+</a>
+{% endif %}
+
+</li>
+{% endfor %}
+<div class="pagination">
+{{ macros.pagination_widget(pagination, '.index') }}
+</div>
+</ul>
+<div style="background:black none repeat scroll 0% 0%;color:#BFC9D3;float:bottom">
+	<div class="container">
+		<div class="row" style="padding-top:30px;">
+			<div class="col-md-7">
+				<p class="lead"> Designed and built by <a href="/">Lyn</a>.</p>
+				<p >@SERVER BY <strong>NGINX</strong> AND POWER BY <strong>DIGITALOCEAN</strong>.</p>
+
+			</div>
+			<div class="col-md-5">
+				<div>
+					<h5 style="margin-bottom:15px;margin-left:18px;"><strong>CONTACT ME</strong></h5>
+					<ul>
+						<li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> &nbsp WECHAT</a></li>
+						<li><a href="http://weibo.com/1870297755/profile"><span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span> &nbsp WEIBO</li>
+						<li><a href="#"><span class=" glyphicon glyphicon-send" aria-hidden="true"></span>&nbsp EMAIL:<strong>daiguanlin@126.com</strong></a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<p> <small>© COPYRIGHT BY Lyn 2015</small></p>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}
