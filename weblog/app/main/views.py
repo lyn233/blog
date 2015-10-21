@@ -2,23 +2,22 @@ __author__ = 'daiguanlin'
 # -*- coding:utf-8 -*-
 from flask import render_template, session, redirect, url_for, flash, abort, request
 from flask_login import login_required,login_user,logout_user,current_user
-
+from datetime import datetime
 from .import main
 from .import forms
 from weblog.app import db
 from weblog.app import models,login_manager
-from weblog.app.models import User,Post
+from weblog.app.models import User,Post,Tag,Template
 from flask_login import LoginManager
 
 @main.route('/')
 def index():
      #posts = Post.query.all()
-
     page = request.args.get('page', 1, type=int)
     #page = request.arges.get('page',1,type=int)
     pagination = Post.query.paginate(page, per_page=4, error_out=True)
     posts = pagination.items
-    return render_template('index.html', posts=posts, pagination=pagination)
+    return render_template('index.html', posts=posts, pagination=pagination, current_time=datetime.utcnow())
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
@@ -60,16 +59,18 @@ def logout():
 @login_required
 def user(username):
     user = User.query.filter_by(name=username).first()
+    tem = Template.query.first()
     form = forms.PostForm()
     if user is None:
         abort(404)
     elif form.validate_on_submit():
-        post = Post(body=form.body.data, author=current_user._get_current_object())
+        post = Post(title=form.title.data, body=form.body.data,summary=form.summary.data,
+                    author=current_user._get_current_object(), post_time=datetime.now())
         db.session.add(post)
         db.session.commit()
         flash("发表成功")
-        return redirect(url_for(".index"))
-        #return render_template('user.html', user=user,form=form)
+        return redirect(url_for(".index", current_tiem=datetime.utcnow()))
+    form.body.data = tem.tem_body #这里赋值和下面post里的body有冲突
     return render_template('user.html', user=user, form=form)
 
 @main.route("/user/<username>/article", methods=["GET", "POST"])
@@ -98,6 +99,7 @@ def register():
         return redirect(url_for('.login'))
     return render_template("register.html", form=form)
 
+
 @main.route('/edit/<int:id>', methods=["GET", "POST"])
 @login_required
 def edit(id):
@@ -106,13 +108,35 @@ def edit(id):
         abort(403)
     form = forms.PostForm()
     if form.validate_on_submit():
+        post.title = form.title.data
+        post.summary = form.summary.data
         post.body = form.body.data
+        post.post_time = datetime.now()
         db.session.add(post)
         flash("编辑成功")
         return redirect("")
         #return redirect(url_for('post', id=post.id))
+    form.title.data = post.title
     form.body.data = post.body
+    form.summary.data = post.summary
     return render_template('edit_post.html', form=form)
+
+
+@main.route('/template', methods=["POST", "GET"])
+def template():
+    form = forms.TemForm()
+    tem = Template.query.first()
+    if form.validate_on_submit():
+        tem = Template(tem_body=form.tem_body.data)
+        db.session.add(tem)
+        return redirect("")
+    #form.tem_body.data = tem.tem_body
+    return render_template("tem.html", form=form)
+
+@main.route('/entry/<int:id>')
+def entry(id):
+    post = Post.query.get_or_404(id)
+    return render_template('entry.html', post=post)
 
 
 @login_manager.user_loader

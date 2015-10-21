@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "wtf.html" as wtf %}
 {% import "_macros.html" as macros %}
-{% block title %}Recycle{% endblock %}
+{% block title %}一千减七等于几{% endblock %}
 
 
 {% block content %}
@@ -15,8 +15,10 @@
 <ul class="posts">
 {% for post in posts %}
 <li class="post" style="margin:3px">
-<div class="post-body" style="padding:2px">{{ post.body }}</div>
-<div class="post-author" style="margin:2px;padding:2px">作者：{{post.author.name}}</div>
+	<div class="" style=""><a href="{{url_for('.entry',id=post.id)}}">{{post.title}}</a></div>
+	<div class="" style="color:grey"><span style="">Post time:</span> {{post.post_time}}</div>
+	<div class="post-body" style="padding:2px">{{ post.summary_html | safe }}</div>
+	<div class="post-author" style="margin:2px;padding:2px"><span>作者：{{post.author.name}}</span><a style="float:right;color:blue" href="{{url_for('.entry',id=post.id)}}">Read more</a></div>
 
 {% if current_user == post.author %}
 <a href="{{ url_for('.edit', id=post.id) }}">
@@ -30,6 +32,10 @@
 {{ macros.pagination_widget(pagination, '.index') }}
 </div>
 </ul>
+<div class="time" style="color:grey;margin:10px">
+<p>本地时间: {{moment(current_time).format('LLL')}}</p>
+<p>刷新于{{moment(current_time).fromNow(refresh=True)}}</p>
+</div>
 <div style="background:black none repeat scroll 0% 0%;color:#BFC9D3;float:bottom">
 	<div class="container">
 		<div class="row" style="padding-top:30px;">
@@ -43,7 +49,7 @@
 					<h5 style="margin-bottom:15px;margin-left:18px;"><strong>CONTACT ME</strong></h5>
 					<ul>
 						<li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> &nbsp WECHAT</a></li>
-						<li><a href="http://weibo.com/1870297755/profile"><span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span> &nbsp WEIBO</li>
+						<li><a href="http://weibo.com/1870297755/profile"><span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span> &nbsp WEIBO </a></li>
 						<li><a href="#"><span class=" glyphicon glyphicon-send" aria-hidden="true"></span>&nbsp EMAIL:<strong>daiguanlin@126.com</strong></a></li>
 					</ul>
 				</div>
@@ -59,4 +65,5 @@
 {% block scripts %}
 {{ super() }}
 {{ pagedown.include_pagedown() }}
+{{moment.include_moment()}}
 {% endblock %}

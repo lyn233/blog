@@ -13,7 +13,8 @@
 
     {% if current_user == post.author %}
         <li class="post" style="margin:10px">
-        <div class="post-body" style="padding:5px">{{ post.body }}</div>
+        <div class="post-title" style="">{{post.title}}</div>
+        <div class="post-body" style="padding:5px">{{ post.body_html |safe }}</div>
         <div class="" style="padding:2px">作者: {{post.author.name}}</div>
         <a href="{{ url_for('.edit', id=post.id) }}" style="margin:1px">
         <span class="label label-primary">Edit</span>
@@ -22,4 +23,9 @@
     {% endif %}
     {% endfor %}
 </ul>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
 {% endblock %}

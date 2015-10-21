@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Article{% endblock %}
+{% import "wtf.html" as wtf %}
+{% block content %}
+{{super()}}
+        <style>
+            ul.posts {background-color:white}
+            div.col {float:center,bottom}
+            div.post-body {color:#7fffb9;background-color:rgb(51,51,51);width:1024px;text-indent:2em}
+        </style>
+<ul class="posts" style="background-color:#EEE">
+        <div class="post-title" style="">{{post.title}}</div>
+        <div class="post-body" style="padding:5px">{{ post.body_html |safe }}</div>
+        <div class="" style="padding:2px">作者: {{post.author.name}}</div>
+</ul>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

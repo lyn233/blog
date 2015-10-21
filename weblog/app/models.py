@@ -4,12 +4,21 @@ from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app
+import bleach
+from markdown import markdown
+
+class Permission():
+    WRITE_ARTICLES = 0x01
+    ADMINISTER = 0x02
 
 
 class Role(db.Model):
     __tablename__ = 'Role'
     id = db.Column(db.Integer, primary_key=True)
     role_name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean, default=False, index=True)
+    permissions = db.Column(db.Integer)
+    #users = db.relationship('Role', backref='role', lazy='dynamic')
     role_id = db.Column(db.Integer, db.ForeignKey('User.id'))
 
 
@@ -75,13 +84,36 @@ def create_user(name, email, password_hash):
     return user
 
 
+class Tag(db.Model):
+    __tablename__ = 'Tag'
+    id = db.Column(db.Integer, primary_key=True)
+    tag_name = db.Column(db.String(50))
+
+class Template(db.Model):
+    __tablename__ = 'Template'
+    id = db.Column(db.Integer, primary_key=True)
+    tem_body = db.Column(db.Text)
+
 class Post(db.Model):
     __tablename__ = 'Post'
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100))
     body = db.Column(db.Text)
+    summary = db.Column(db.Text)
+    post_time = db.Column(db.DateTime)
     author_id = db.Column(db.Integer, db.ForeignKey('User.id'))
+    body_html = db.Column(db.Text)
+    summary_html = db.Column(db.Text)
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
+    @staticmethod
+    def on_changed_body(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul','h1', 'h2', 'h3', 'p']
+        target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'), tags=allowed_tags, strip=True))
+
+    @staticmethod
+    def on_changed_summary(target,value,oldvalue,initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul','h1', 'h2', 'h3', 'p']
+        target.summary_html= bleach.linkify(bleach.clean(markdown(value, output_format='html'), tags=allowed_tags, strip=True))
+
+db.event.listen(Post.body, 'set', Post.on_changed_body)
+db.event.listen(Post.summary,'set',Post.on_changed_summary)
