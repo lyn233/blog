@@ -6,9 +6,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
 
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'guess'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or ''
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:8511@localhost/blog'
+    SQLALCHEMY_DATABASE_URI = ''
 
     @staticmethod
     def init_app(app):
